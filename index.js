@@ -381,6 +381,8 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(4323, () => {
-  console.log("server is connectrd");
+let port = process.env.PORT || 4323;
+
+server.listen(port, () => {
+  console.log(`server is connectrd ${port}`);
 });
