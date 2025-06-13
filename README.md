@@ -1,2 +1,3 @@
 # urlShorter
-it is a application by usong which u can short any url 
+
+it is a application by using which you can short any url
