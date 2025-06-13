@@ -1,0 +1,93 @@
+
+      * {
+        box-sizing: border-box;
+        margin: 0%;
+        font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+      }
+      body{
+        
+          background-color: rgba(180, 182, 182, 0.737);
+      }
+      #short-form {
+        position: relative;
+        height: 100vh;
+      
+      }
+      .formBox {
+        border-radius: 0.4rem;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 1rem;
+        background-color: #fff;
+        min-width: 20rem;
+       width: 40%;
+        box-shadow: 0px 0px 8px 5px rgba(103, 102, 102, 0.349);
+       max-height: 600px;
+
+        & button {
+          border: none;
+          cursor: pointer;
+          padding: 0.4rem 1rem;
+          border-radius: 0.3rem;
+          background-color: cadetblue;
+          box-shadow: 1px 2px 4px 1px rgba(105, 105, 105, 0.545);
+          color: #fff;
+          &:active {
+            box-shadow: none;
+          }
+          &:hover {
+            transition: background-color 0.5s;
+
+            background-color: rgba(93, 90, 90, 0.758);
+          }
+        }
+        & ul{
+         max-height: 20rem;
+            overflow-y: scroll;
+          
+            
+        }
+        & ul>li{
+        
+       list-style: none;
+      
+     width: 100%;
+   margin: 0.5rem 0px;
+   border-bottom: 1px solid gray;
+   padding-bottom: 0.5rem;
+         & span{
+          display: inline;
+  max-width: 100%;
+word-wrap: break-word;
+line-height: 1.5rem;
+ 
+     }
+        }
+      }
+      h2 {
+        margin-bottom: 1rem;
+        text-align: center;
+        color: cadetblue;
+        &:nth-of-type(2) {
+          color: rgba(53, 52, 52, 0.695);
+        }
+      }
+      div {
+        margin: 0.5rem 0 1rem 0;
+        height: 3rem;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      input {
+        border: 1px solid rgba(57, 54, 54, 0.448);
+        padding: 0.2rem;
+        &:focus {
+          border: none;
+        }
+      }
+
+     
