@@ -298,10 +298,15 @@ import chalk from "chalk";
 import { createServer } from "http";
 import { readFile, writeFile } from "fs/promises";
 import { randomBytes } from "crypto";
-import { sourceMapsEnabled } from "process";
+import express from "express";
+import path from "path";
+
+const app = express();
 
 const DATA_FILE = "data/links.json";
 
+app.use(express.static("public"));
+app.use(express.urlencoded());
 const serveFile = async (res, filePath, contentType) => {
   try {
     const data = await readFile(filePath);
@@ -330,6 +335,96 @@ const saveLink = async (links) => {
   await writeFile(DATA_FILE, JSON.stringify(links), "utf-8");
 };
 
+let newFile = async (req) => {
+  let file = await readFile(
+    path.join(import.meta.dirname, "/views/index.html")
+  );
+  let link = await loadLinks();
+
+  let content = file.toString().replaceAll(
+    "{{content}}",
+    Object.entries(link)
+      .map(([shortCode, url]) => {
+        return `<li><span>
+          <a href="/${shortCode}" target="_blank">
+            ${req.hostname}/${shortCode}
+          </a>
+          - ${url}
+        </span></li>`;
+      })
+      .join("")
+  );
+
+  return content;
+};
+
+app.get("/", async (req, res) => {
+  try {
+    let content = await newFile(req);
+    res.status(200).send(content);
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .send(`<h1> internal server error >click me </a> for home page </h1> `);
+  }
+});
+app.get("/:shorten", async (req, res) => {
+  try {
+    let link = await loadLinks();
+
+    const { shorten } = req.params;
+    if (!link[shorten]) {
+      return res
+        .status(404)
+        .send(
+          `<h1> shortern url is incorrect <a href="/">click me </a> for home page </h1>`
+        );
+    }
+    return res.redirect(link[shorten]);
+  } catch (err) {
+    console.log(err);
+    res
+      .status(404)
+      .send(
+        `<h1> internal server error <a href="/" >click me </a> for home page </h1> `
+      );
+  }
+});
+app.post("/shorten", async (req, res) => {
+  try {
+    const links = await loadLinks();
+
+    let { shortCode, url } = req.body;
+    if (!url) {
+      return res
+        .status(400)
+        .send(
+          `<h1>url is not fount <a href="/">click me </a> for home page </h1>`
+        );
+    }
+
+    const finalShortCode = shortCode || randomBytes(4).toString("hex");
+
+    if (links[finalShortCode]) {
+      return res
+        .status(400)
+        .send(
+          `<h1>shortCode already exsists  please choose another .  <a href=" /">click me </a> for home page </h1>`
+        );
+    }
+
+    links[finalShortCode] = url;
+    await saveLink(links);
+
+    return res.status(200).send({ success: true, shortCode: finalShortCode });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .send(`<h1> internal server error >click me </a> for home page </h1> `);
+  }
+});
 const server = createServer(async (req, res) => {
   const links = await loadLinks();
 
@@ -383,6 +478,10 @@ const server = createServer(async (req, res) => {
 
 let port = process.env.PORT || 4323;
 
-server.listen(port, () => {
-  console.log(`server is connectrd ${port}`);
+// server.listen(port, () => {
+//   console.log(`server is connectrd ${port}`);
+// });
+
+app.listen(port, () => {
+  console.log(`server is connected to port ${port}`);
 });
