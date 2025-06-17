@@ -188,9 +188,9 @@ const rl = createInterface({
 
 //  random kokes
 
-import https from "https";
-import { json } from "stream/consumers";
-import chalk from "chalk";
+// import https from "https";
+// import { json } from "stream/consumers";
+// import chalk from "chalk";
 
 // const getJokes = () => {
 //   http.get("http://official-joke-api.appspot.com/random_joke", (res) => {
@@ -295,192 +295,20 @@ import chalk from "chalk";
 
 //// URL SHORTER
 
-import { createServer } from "http";
-import { readFile, writeFile } from "fs/promises";
-import { randomBytes } from "crypto";
 import express from "express";
+import { shortenRoute } from "./routes/shorten.routes.js";
 import path from "path";
 
 const app = express();
 
-const DATA_FILE = "data/links.json";
-
 app.use(express.static("public"));
-app.use(express.urlencoded());
-const serveFile = async (res, filePath, contentType) => {
-  try {
-    const data = await readFile(filePath);
-    res.writeHead(200, `Content-Type:${contentType}`);
-    res.end(data);
-  } catch (err) {
-    res.writeHead(404, `Content-Type:plain/text`);
-    res.end("404 error");
-  }
-};
+app.use(express.urlencoded({ extended: true }));
 
-const loadLinks = async () => {
-  try {
-    let data = await readFile(DATA_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      await writeFile(DATA_FILE, JSON.stringify({}), "utf-8");
-      return {};
-    }
-    throw err;
-  }
-};
+app.use(shortenRoute);
 
-const saveLink = async (links) => {
-  await writeFile(DATA_FILE, JSON.stringify(links), "utf-8");
-};
-
-let newFile = async (req) => {
-  let file = await readFile(
-    path.join(import.meta.dirname, "/views/index.html")
-  );
-  let link = await loadLinks();
-
-  let content = file.toString().replaceAll(
-    "{{content}}",
-    Object.entries(link)
-      .map(([shortCode, url]) => {
-        return `<li><span>
-          <a href="/${shortCode}" target="_blank">
-            ${req.hostname}/${shortCode}
-          </a>
-          - ${url}
-        </span></li>`;
-      })
-      .join("")
-  );
-
-  return content;
-};
-
-app.get("/", async (req, res) => {
-  try {
-    let content = await newFile(req);
-    res.status(200).send(content);
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .send(`<h1> internal server error >click me </a> for home page </h1> `);
-  }
-});
-app.get("/:shorten", async (req, res) => {
-  try {
-    let link = await loadLinks();
-
-    const { shorten } = req.params;
-    if (!link[shorten]) {
-      return res
-        .status(404)
-        .send(
-          `<h1> shortern url is incorrect <a href="/">click me </a> for home page </h1>`
-        );
-    }
-    return res.redirect(link[shorten]);
-  } catch (err) {
-    console.log(err);
-    res
-      .status(404)
-      .send(
-        `<h1> internal server error <a href="/" >click me </a> for home page </h1> `
-      );
-  }
-});
-app.post("/shorten", async (req, res) => {
-  try {
-    const links = await loadLinks();
-
-    let { shortCode, url } = req.body;
-    if (!url) {
-      return res
-        .status(400)
-        .send(
-          `<h1>url is not fount <a href="/">click me </a> for home page </h1>`
-        );
-    }
-
-    const finalShortCode = shortCode || randomBytes(4).toString("hex");
-
-    if (links[finalShortCode]) {
-      return res
-        .status(400)
-        .send(
-          `<h1>shortCode already exsists  please choose another .  <a href=" /">click me </a> for home page </h1>`
-        );
-    }
-
-    links[finalShortCode] = url;
-    await saveLink(links);
-
-    return res.status(200).send({ success: true, shortCode: finalShortCode });
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .send(`<h1> internal server error >click me </a> for home page </h1> `);
-  }
-});
-const server = createServer(async (req, res) => {
-  const links = await loadLinks();
-
-  if (req.method === "GET") {
-    if (req.url === "/") {
-      return serveFile(res, "index.html", "plain/html");
-    } else if (req.url === "/shorten") {
-      res.writeHead(200, { "content-type": "apllication/json" });
-      return res.end(JSON.stringify(links));
-    } else if (req.url === "/index.css") {
-      return serveFile(res, "index.css", "plain/css");
-    } else {
-      let link = await loadLinks();
-      let shortCode = req.url.slice(1);
-      if (link[shortCode]) {
-        res.writeHead(302, { location: link[shortCode] });
-        return res.end();
-      }
-      res.writeHead(400, { "Content-type": "text/plain" });
-      return res.end("shorterend url is notfound");
-    }
-  }
-  if (req.method === "POST" && req.url === "/shorten") {
-    let data = "";
-    req.on("data", (chunk) => {
-      data += chunk;
-    });
-    req.on("end", async () => {
-      const { url, shortCode } = JSON.parse(data);
-      if (!url) {
-        res.writeHead(400, { "Content-type": "text/plain" });
-        return res.end("url is required");
-      }
-
-      const finalShortCode = shortCode || randomBytes(4).toString("hex");
-
-      if (links[finalShortCode]) {
-        res.writeHead(400, { "Content-type": "text/plain" });
-        return res.end("shortCode already exsists . please choose another");
-      }
-
-      links[finalShortCode] = url;
-      await saveLink(links);
-      res.writeHead(200, { "Content-type": "application/json" });
-      return res.end(
-        JSON.stringify({ success: true, shortCode: finalShortCode })
-      );
-    });
-  }
-});
+app.set("view engine", "ejs");
 
 let port = process.env.PORT || 4323;
-
-// server.listen(port, () => {
-//   console.log(`server is connectrd ${port}`);
-// });
 
 app.listen(port, () => {
   console.log(`server is connected to port ${port}`);

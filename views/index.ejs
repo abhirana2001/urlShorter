@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <link rel="stylesheet" href="index.css" />
+  <body>
+    <form id="short-form" action="/shorten" method="post">
+      <section class="formBox">
+        <h2>URL Shorter</h2>
+        <div>
+          <label for="url">Url</label>
+          <input type="text" name="url" id="url" />
+        </div>
+        <div>
+          <label for="shortCode">Short Code</label>
+          <input type="text" name="shortCode" id="shortCode" />
+        </div>
+        <button type="submit">submit</button>
+        <h2>Shortened URLs</h2>
+        <ul id="shortend-url">
+          <% link.map(({shortCode, url}) => { %>
+          <li>
+            <span>
+              <a href="/<%=shortCode%>" target="_blank">
+                <%=host %>/<%=shortCode%>
+              </a>
+              - <%=url %>
+            </span>
+          </li>
+          <% }) %>
+        </ul>
+      </section>
+    </form>
+    <script>
+      // const fetchShotendLinks = async () => {
+      //   const res = await fetch("/shorten");
+      //   const data = await res.json();
+      //   let list = document.getElementById("shortend-url");
+      //   list.innerHTML = "";
+      //   for (const [shortCode, url] of Object.entries(data)) {
+      //     let li = document.createElement("li");
+
+      //     li.innerHTML = `<span><a   href="/${shortCode}" target="_blank">${window.location.origin}/${shortCode}</a> - ${url} </span>`;
+      //     list.appendChild(li);
+      //   }
+      // };
+
+      // document
+      //   .getElementById("short-form")
+      //   .addEventListener("submit", async (e) => {
+      //     e.preventDefault();
+      //     let formData = new FormData(e.target);
+      //     let url = formData.get("url");
+      //     let shortCode = formData.get("shortCode");
+
+      //     try {
+      //       const res = await fetch("/shorten", {
+      //         method: "POST",
+      //         headers: { "Content-Type": "application/json" },
+      //         body: JSON.stringify({ url, shortCode }),
+      //       });
+      //       if (res.ok) {
+      //         fetchShotendLinks();
+      //         alert("form submitted scussefully");
+      //         e.target.reset();
+      //       } else {
+      //         const errorMesssage = await res.text();
+      //         alert(errorMesssage);
+      //       }
+      //     } catch (err) {
+      //       console.log(err);
+      //     }
+      //   });
+
+      // fetchShotendLinks();
+    </script>
+  </body>
+</html>
