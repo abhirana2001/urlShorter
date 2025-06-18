@@ -30,8 +30,12 @@ export const chkShortenLink = async (shorten) => {
     const findShortenLink = await prisma.shortLink.findUnique({
       where: { shortCode: shorten },
     });
+    console.log(findShortenLink);
+
     return findShortenLink;
   } catch (err) {
     throw err;
   }
 };
+
+chkShortenLink("jionoi");

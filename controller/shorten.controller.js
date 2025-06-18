@@ -1,10 +1,15 @@
 import { randomBytes } from "crypto";
 
-import { chkShortenLink, loadLinks, saveLink } from "../model/shorten.model.js";
+// import { chkShortenLink, loadLinks, saveLink } from "../model/shorten.model.js";
+import {
+  chkShortCodeExsist,
+  createShortCode,
+  getAllLinks,
+} from "../services/shorten.services.js";
 
 export const getHomePage = async (req, res) => {
   try {
-    let link = await loadLinks();
+    let link = await getAllLinks();
 
     res.render("index", { link, host: req.host });
   } catch (err) {
@@ -20,7 +25,7 @@ export const getHomePage = async (req, res) => {
 export const getRedirectLink = async (req, res) => {
   try {
     const { shorten } = req.params;
-    let link = await chkShortenLink(shorten);
+    let link = await chkShortCodeExsist(shorten);
 
     if (!link) {
       return res
@@ -29,7 +34,7 @@ export const getRedirectLink = async (req, res) => {
           `<h1> shortern url is incorrect <a href="/">click me </a> for home page </h1>`
         );
     }
-    return res.redirect(link.url);
+    return res.redirect(link[0].url);
   } catch (err) {
     console.log(err);
     res
@@ -44,8 +49,6 @@ export const postShortenLink = async (req, res) => {
   try {
     let { shortCode, url } = req.body;
 
-    console.log(req.body);
-
     if (!url) {
       return res
         .status(400)
@@ -55,9 +58,10 @@ export const postShortenLink = async (req, res) => {
     }
 
     const finalShortCode = shortCode || randomBytes(4).toString("hex");
-    let link = await chkShortenLink(finalShortCode);
 
-    if (link) {
+    let link = await chkShortCodeExsist(finalShortCode);
+
+    if (link.shortCode) {
       return res
         .status(400)
         .send(
@@ -65,7 +69,7 @@ export const postShortenLink = async (req, res) => {
         );
     }
 
-    await saveLink({ url, shortCode: finalShortCode });
+    await createShortCode({ url, shortCode: finalShortCode });
 
     return res.status(200).send({ success: true, shortCode: finalShortCode });
   } catch (err) {
