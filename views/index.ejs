@@ -7,33 +7,40 @@
   </head>
   <link rel="stylesheet" href="index.css" />
   <body>
-    <form id="short-form" action="/shorten" method="post">
-      <section class="formBox">
-        <h2>URL Shorter</h2>
-        <div>
-          <label for="url">Url</label>
-          <input type="text" name="url" id="url" />
-        </div>
-        <div>
-          <label for="shortCode">Short Code</label>
-          <input type="text" name="shortCode" id="shortCode" />
-        </div>
-        <button type="submit">submit</button>
-        <h2>Shortened URLs</h2>
-        <ul id="shortend-url">
-          <% link.map(({shortCode, url}) => { %>
-          <li>
-            <span>
-              <a href="/<%=shortCode%>" target="_blank">
-                <%=host %>/<%=shortCode%>
-              </a>
-              - <%=url %>
-            </span>
-          </li>
-          <% }) %>
-        </ul>
-      </section>
-    </form>
+    <%- include("./header.ejs") %> <% if(isLoggedIn){ %>
+    <main>
+      <form id="short-form" action="/shorten" method="post">
+        <section class="formBox">
+          <h2>URL Shorter</h2>
+          <div>
+            <label for="url">Url</label>
+            <input type="text" name="url" id="url" />
+          </div>
+          <div>
+            <label for="shortCode">Short Code</label>
+            <input type="text" name="shortCode" id="shortCode" />
+          </div>
+          <button type="submit">submit</button>
+          <h2>Shortened URLs</h2>
+          <ul id="shortend-url">
+            <% link.map(({shortCode, url}) => { %>
+            <li>
+              <span>
+                <a href="/<%=shortCode%>" target="_blank">
+                  <%=host %>/<%=shortCode%>
+                </a>
+                - <%=url %>
+              </span>
+            </li>
+            <% }) %>
+          </ul>
+        </section>
+      </form>
+    </main>
+    <%} else{ %>
+    <main><h1>First login</h1></main>
+
+    <%}%>
     <script>
       // const fetchShotendLinks = async () => {
       //   const res = await fetch("/shorten");

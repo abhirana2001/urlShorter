@@ -9,9 +9,12 @@ import {
 
 export const getHomePage = async (req, res) => {
   try {
+    const isLoggedIn = req.cookies;
+    console.log(isLoggedIn, "cookie");
+
     let link = await getAllLinks();
 
-    res.render("index", { link, host: req.host });
+    res.render("index", { link, host: req.host, isLoggedIn });
   } catch (err) {
     console.log(err);
     res

@@ -298,12 +298,14 @@ const rl = createInterface({
 import express from "express";
 import { shortenRoute } from "./routes/shorten.routes.js";
 import path from "path";
-
+import { authRoutes } from "./routes/auth.routes.js";
+import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
+app.use(authRoutes);
 app.use(shortenRoute);
 
 app.set("view engine", "ejs");
