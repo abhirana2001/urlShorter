@@ -300,11 +300,29 @@ import { shortenRoute } from "./routes/shorten.routes.js";
 import path from "path";
 import { authRoutes } from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
+import { verifyJwtToken } from "./middleware/verify.middleware.js";
+import session from "express-session";
+import flash from "connect-flash";
 const app = express();
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
+app.use(
+  session({
+    secret: "anything",
+    resave: true,
+    saveUninitialized: false,
+  })
+);
+app.use(flash());
+app.use(verifyJwtToken);
+
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  return next();
+});
 app.use(authRoutes);
 app.use(shortenRoute);
 

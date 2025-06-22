@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1750263926929,
-      "tag": "0000_shiny_manta",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1750418732074,
-      "tag": "0001_slim_patriot",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1750419462948,
-      "tag": "0002_fair_sister_grimm",
+      "when": 1750613218479,
+      "tag": "0000_lowly_santa_claus",
       "breakpoints": true
     }
   ]

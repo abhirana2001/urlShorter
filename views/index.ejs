@@ -7,7 +7,7 @@
   </head>
   <link rel="stylesheet" href="index.css" />
   <body>
-    <%- include("./header.ejs") %> <% if(isLoggedIn){ %>
+    <%- include("./header.ejs") %> <% if(user){ %>
     <main>
       <form id="short-form" action="/shorten" method="post">
         <section class="formBox">

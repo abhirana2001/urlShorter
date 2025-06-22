@@ -10,9 +10,8 @@ import {
 export const getHomePage = async (req, res) => {
   try {
     const isLoggedIn = req.cookies;
-    console.log(isLoggedIn, "cookie");
 
-    let link = await getAllLinks();
+    let link = await getAllLinks({ id: req.user.id });
 
     res.render("index", { link, host: req.host, isLoggedIn });
   } catch (err) {
@@ -37,7 +36,7 @@ export const getRedirectLink = async (req, res) => {
           `<h1> shortern url is incorrect <a href="/">click me </a> for home page </h1>`
         );
     }
-    return res.redirect(link[0].url);
+    return res.redirect(link[0]?.url);
   } catch (err) {
     console.log(err);
     res
@@ -72,9 +71,9 @@ export const postShortenLink = async (req, res) => {
         );
     }
 
-    await createShortCode({ url, shortCode: finalShortCode });
+    await createShortCode({ url, shortCode: finalShortCode, id: req.user.id });
 
-    return res.status(200).send({ success: true, shortCode: finalShortCode });
+    return res.redirect("/");
   } catch (err) {
     console.log(err);
     res
